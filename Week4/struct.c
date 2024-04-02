@@ -35,4 +35,5 @@ int main() {
     printf("not equal\n");  // 하나라도 틀리면 서로 다른 것을 의미.
   printf("[----- [이규민] [2021039002] -----]\n");
   return 0;
+  // for 2nd commit
 }

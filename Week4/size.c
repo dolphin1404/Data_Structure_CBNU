@@ -6,4 +6,5 @@ void main() {
   printf("sizeof(*x) = %lu\n", sizeof(*x)); // *x의 크기를 출력, 이중 포인터이므로 여전히 포인터 크기 8바이트 출력
   printf("sizeof(**x) = %lu\n", sizeof(**x)); // **x의 크기를 출력, int형이기에 4바이트 출력
   printf("[----- [이규민] [2021039002] -----]\n");
+  //for 2nd commit
 }
