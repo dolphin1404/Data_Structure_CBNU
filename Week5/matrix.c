@@ -100,7 +100,7 @@ int main() {
   // 행렬 A를 생성하고 채운다.
   int** matrixA = createMatrix(rowsA, colsA);
   printf("Enter the values for matrix A:\n");
-  fillMatrix(matrixA, rowsA, colsA);
+  fillMatrix(matrixA, rowsA, colsA);  
 
   // 행렬 B를 생성하고 채운다.
   int** matrixB = createMatrix(rowsB, colsB);
@@ -145,4 +145,5 @@ int main() {
 
   return 0;
   printf("[----- [이규민] [2021039002] -----]");
+  printf("Second Commit");
 }
