@@ -13,12 +13,13 @@ int** createMatrix(int rows, int cols) {
 }
 
 // 행렬에 입력 받은 rows, cols 이중 for문을 통해 행렬을 랜덤한 수로 채운다.
-void fillMatrix(int** matrix, int rows, int cols) {
+void random_Matrix(int** matrix, int rows, int cols) {
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
       matrix[i][j] = rand() % 10; // 랜덤 값에서 10으로 나눴을 때 나머지로 하였다. 0~9
     }
   }
+  printf("Randomization is complete\n");
 }
 
 // 이중 for문을 통해 행렬을 출력한다.
@@ -97,15 +98,29 @@ int main() {
   printf("Enter matrix B (m, n) : ");
   scanf("%d %d", &rowsB, &colsB);
 
+  // isEqual, isEqual_cr로 행렬 A,B의 크기가 같은 지, 행렬 A의 열과 행렬 B의 행의 크기가 같은 지를 판단하여
+  // 덧셈, 뺄셈이 가능한 지와 행렬곱이 가능한 지를 판단한다. 
+  // 이후 함수에서 if문을 통해 계산을 할 지 말지를 결정한다.
+  int isEqual = 1;  // true >> can do addition and subtraction of matrix A, B
+  if(colsA != colsB || rowsA != rowsB){
+    printf("\nNot equal both matrix's m, n\n\n");
+    isEqual = 0;  // false >> can't do addition and subtraction.
+  }
+  int isEqual_cr = 1; // true >> can do multiplication.
+  if(colsA != rowsB){
+    printf("\nNot equal matrixA's cols and matrixB's rows\n\n");
+    isEqual_cr = 0; // can't do multiplication.
+  }
+
   // 행렬 A를 생성하고 채운다.
   int** matrixA = createMatrix(rowsA, colsA);
-  printf("Enter the values for matrix A:\n");
-  fillMatrix(matrixA, rowsA, colsA);  
+  printf("Randomize matrix A >\n");
+  random_Matrix(matrixA, rowsA, colsA);  
 
   // 행렬 B를 생성하고 채운다.
   int** matrixB = createMatrix(rowsB, colsB);
-  printf("Enter the values for matrix B:\n");
-  fillMatrix(matrixB, rowsB, colsB);
+  printf("Randomize matrix B >\n");
+  random_Matrix(matrixB, rowsB, colsB);
 
   // 입력받은 행렬 A를 출력
   printf("Matrix A:\n");
@@ -116,34 +131,39 @@ int main() {
   print_Matrix(matrixB, rowsB, colsB);
 
   // 행렬 A, B의 합
-  int** sumMatrix = addition_Matrix(matrixA, matrixB, rowsA, colsA);
-  printf("Sum of matrix A and B:\n");
-  print_Matrix(sumMatrix, rowsA, colsA);
+  int** addMatrix = addition_Matrix(matrixA, matrixB, rowsA, colsA);
+  printf("Addition of matrix A and B:\n");
+  if(isEqual != 1){ // 같지 않으면 행렬합은 불가능
+    printf("SRY, Can't addition\n");
+  }else print_Matrix(addMatrix, rowsA, colsA);
 
   // 행렬 A, B의 뺄셈
-  int** diffMatrix = subtraction_Matrix(matrixA, matrixB, rowsA, colsA);
+  int** subtMatrix = subtraction_Matrix(matrixA, matrixB, rowsA, colsA);
   printf("Subtraction of matrix A and B:\n");
-  print_Matrix(diffMatrix, rowsA, colsA);
+  if(isEqual != 1){ // 같지 않으면 행렬뺄셈은 불가능
+    printf("SRY, Can't subtraction\n");
+  }else print_Matrix(subtMatrix, rowsA, colsA);
 
   // 행렬 A를 전치행렬로 바꾼다.
-  int** transposeA = transpose_Matrix(matrixA, rowsA, colsA);
+  int** tranMatrixA = transpose_Matrix(matrixA, rowsA, colsA);
   printf("Transpose of matrix A:\n");
-  print_Matrix(transposeA, colsA, rowsA);
+  print_Matrix(tranMatrixA, colsA, rowsA);
 
   // 행렬 A와 B를 곱한다.
-  int** productMatrix = multiply_Matrix(matrixA, matrixB, rowsA, colsA, colsB);
-  printf("Product of matrix A and B:\n");
-  print_Matrix(productMatrix, rowsA, colsB);
+  int** multiMatrix = multiply_Matrix(matrixA, matrixB, rowsA, colsA, colsB);
+  printf("Multiplication of matrix A and B:\n");
+  if(isEqual_cr != 1) printf("SRY, Can't Multiplication\n");  
+  // A의 열과 B의 행의 크기가 같지 않으면 행렬곱 불가능
+  else print_Matrix(multiMatrix, rowsA, colsB);
 
   // 지금까지 선언한 행렬들에 할당된 메모리를 해제한다.
   free_Matrix(matrixA, rowsA);
   free_Matrix(matrixB, rowsB);
-  free_Matrix(sumMatrix, rowsA);
-  free_Matrix(diffMatrix, rowsA);
-  free_Matrix(transposeA, colsA);
-  free_Matrix(productMatrix, rowsA);
+  free_Matrix(addMatrix, rowsA);
+  free_Matrix(subtMatrix, rowsA);
+  free_Matrix(tranMatrixA, colsA);
+  free_Matrix(multiMatrix, rowsA);
 
   return 0;
   printf("[----- [이규민] [2021039002] -----]");
-  printf("Second Commit");
 }
