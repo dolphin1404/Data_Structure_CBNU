@@ -135,13 +135,13 @@ int initializeBST(Node** h) {  // 이진탐색트리 초기화
   *h = (Node*)malloc(sizeof(Node));
   (*h)->left = NULL; /* root */
   (*h)->right = *h;
-  (*h)->key = NULL;
+  (*h)->key = -9999;
   return 1;
 }
 
 // infix와 같은 방식, 왼쪽 자식 노드를 먼저 출력 후 부모 노드로
 void inorderTraversal(Node* ptr) {
-  if (ptr) {
+  if (ptr) { // ptr가 존재하는 경우
     inorderTraversal(ptr->left);
     printf(" [%d] ", ptr->key);  // 중위순회
     inorderTraversal(ptr->right);
@@ -150,8 +150,6 @@ void inorderTraversal(Node* ptr) {
 
 // prefix와 같은 방식, 부모 노드를 먼저 출력 후 자식 노드로 경유
 void preorderTraversal(Node* ptr) {
-  if (ptr == NULL) return;  // ptr이 비어있는 경우의 오류 핸들링
-
   if (ptr) {
     printf(" [%d] ", ptr->key);  // 전위순회
     preorderTraversal(ptr->left);
@@ -160,8 +158,6 @@ void preorderTraversal(Node* ptr) {
 }
 // posftix와 같은 방식, 자식 노드들 먼저 출력 후 부모 노드로
 void postorderTraversal(Node* ptr) {
-  if (ptr == NULL) return;  // ptr이 비어있는 경우의 오류 핸들링
-
   if (ptr) {
     postorderTraversal(ptr->left);
     postorderTraversal(ptr->right);
@@ -176,7 +172,7 @@ int insert(Node* head, int key) {
   newNode->left = NULL;  // 새로운 노드의 왼쪽 자식 노드를 NULL로 초기화
   newNode->right = NULL;  // 새로운 노드의 오른쪽 자식 노드를 NULL로 초기화
 
-  if (head == NULL)  // 헤더가 비어있는 경우
+  if (head == NULL)  // 오류 핸들링 : 헤더가 비어있는 경우
   {
     head = newNode;  // 헤더에 새로운 노드를 넣음
     return 1;
@@ -187,71 +183,73 @@ int insert(Node* head, int key) {
     return 1;
   }
 
-  Node* parent = NULL;
-  Node* current = head->left;
+  Node* parent = NULL; // 부모 노드를 이용하여 새로운 노드를 삽입할 위치를 찾음
+  Node* current = head->left; // 현재 노드를 헤더의 왼쪽 자식 노드로 초기화
 
-  while (current != NULL) {
-    parent = current;
-    if (key < current->key) {
-      current = current->left;
-    } else if (key > current->key) {
+  // 삽입할 위치를 찾는 반복문이다.
+  while (current != NULL) { // 현재 노드가 Null이 아닌 경우 반복문 실행
+    parent = current;   // 부모 노드에 현 노드를 넣어 다음 반복문에서 사용
+    if (key < current->key) { // 삽입할 key값이 현재 노드의 key값보다 작은 경우 왼쪽으로 이동
+      current = current->left; 
+    } else if (key > current->key) { // 위 조건과 반대
       current = current->right;
-    } else {
-      printf("Warning: [%d] 이미 존재함\n", key);
-      free(newNode);
+    } else { // key값이 이미 존재하는 경우
+      printf("Warning: [%d] 이미 존재함 다른 키 입력 바람\n", key);
+      free(newNode); // 새로 생성한 노드를 free하고 종료
       return 0;
     }
   }
 
-  if (key < parent->key) {
-    parent->left = newNode;
+  if (key < parent->key) {  // 부모 노드의 key값보다 작은 경우 왼쪽에 삽입
+    parent->left = newNode; // 부모 노드의 왼쪽 자식 노드에 새로운 노드를 넣음
   } else {
-    parent->right = newNode;
+    parent->right = newNode;  // 오른쪽 자식 노드에.
   }
-
+  // 같은 경우는 이미 위에서 처리했으므로 여기서는 처리하지 않음
   return 1;
 }
 
-int deleteLeafNode(Node* head, int key) {
-  if (head == NULL) {
-        printf("The node [%d] does not exist.\n", key);
-        return 0;
-    }
+  // 이진탐색트리에서 노드를 삭제하는 함수 (리프 노드란 자식 노드가 없는 노드를 의미)
+  int deleteLeafNode(Node* head, int key) {
+    if (head == NULL) { // 헤더가 비어있는 경우
+          printf("The node [%d] does not exist.\n", key);
+          return 0;
+      }
 
-    Node* parent = NULL;
-    Node* current = head->left;
+      Node* parent = NULL;  // insert함수와 비슷하게 부모 노드를 이용하여 삭제할 노드를 찾음
+      Node* current = head->left;
 
-    while (current != NULL) {
-        if (key == current->key) {
-            if (current->left == NULL && current->right == NULL) {
-                // 현재 노드가 리프 노드인 경우
-                if (parent == NULL) {
-                    // 트리의 루트 노드가 리프 노드인 경우
-                    head->left = NULL;
-                } else if (parent->left == current) {
-                    parent->left = NULL;
-                } else {
-                    parent->right = NULL;
-                }
-                free(current);
-                return 1;
-            } else {
-                // 현재 노드가 리프 노드가 아닌 경우
-                printf("The node [%d] is not a leaf.\n", key);
-                return 0;
-            }
-        }
-        parent = current;
-        if (key < current->key) {
-            current = current->left;
-        } else {
-            current = current->right;
-        }
-    }
-
-    printf("The node [%d] does not exist.\n", key);
-    return 0;
-}
+    // 삭제할 노드를 찾는 반복문
+      while (current != NULL) {
+          if (key == current->key) { // 입력받은 key값과 현재 노드의 key값이 같은 경우
+              if (current->left == NULL && current->right == NULL) {
+                  // 현재 노드가 리프 노드인 경우
+                  if (parent == NULL) {
+                      // 트리의 루트 노드가 리프 노드인 경우
+                      head->left = NULL;
+                  } else if (parent->left == current) { // 부모 노드의 왼쪽 자식 노드가 현재 노드인 경우
+                      parent->left = NULL; 
+                  } else { // 부모 노드의 오른쪽 자식 노드가 현재 노드인 경우
+                      parent->right = NULL;
+                  }
+                  free(current); // 현재 노드를 free하고 종료
+                  return 1;
+              } else {
+                  // 현재 노드가 리프 노드가 아닌 경우
+                  printf("The node [%d] is not a leaf.\n", key);
+                  return 0;
+              }
+          }
+          parent = current; // 부모 노드에 현재 노드를 넣어 다음 반복문에서 사용
+          if (key < current->key) {  // insert와 비슷함
+              current = current->left;
+          } else {
+              current = current->right;
+          }
+      }
+      printf("The node [%d] does not exist.\n", key);
+      return 0;
+  }
 
 Node* searchRecursive(Node* ptr, int key) {
   if (ptr == NULL)  // ptr이 비어있는 경우
