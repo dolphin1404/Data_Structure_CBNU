@@ -27,14 +27,14 @@ void BFS_adjList(graphType* g, int v);
 
 // 스택 구현 (DFS에서 사용)
 
-typedef int element; // 정수형 데이터 타입 정의
+typedef int element;  // 정수형 데이터 타입 정의
 
 typedef struct stackNode {
   element data;
   struct stackNode* link;
 } stackNode;
 
-stackNode* top = NULL; 
+stackNode* top = NULL;
 
 int isEmpty() {
   if (top == NULL)
@@ -43,7 +43,7 @@ int isEmpty() {
     return 0;
 }
 
-void push(element item) {  
+void push(element item) {
   stackNode* tmp = (stackNode*)malloc(sizeof(stackNode));
   tmp->data = item;
   tmp->link = top;
@@ -107,11 +107,13 @@ element dequeue() {
 
 // 그래프를 초기화하는 함수
 graphType* initializeGraph() {
-  graphType* g = (graphType*)malloc(sizeof(graphType)); // 그래프 헤더 노드 동적할당
+  graphType* g =
+      (graphType*)malloc(sizeof(graphType));  // 그래프 헤더 노드 동적할당
   g->n = 0;
-  for (int i = 0; i < MAX_VERTEX; i++) {    // 미리 지정한 그래프의 최대 정점 개수만큼 반복
-    g->adjList_H[i] = NULL; // 인접 리스트 헤드 포인터를 NULL로 초기화
-    g->visited[i] = 0; // 방문 여부를 나타내는 배열을 0으로 초기화
+  for (int i = 0; i < MAX_VERTEX;
+       i++) {  // 미리 지정한 그래프의 최대 정점 개수만큼 반복
+    g->adjList_H[i] = NULL;  // 인접 리스트 헤드 포인터를 NULL로 초기화
+    g->visited[i] = 0;  // 방문 여부를 나타내는 배열을 0으로 초기화
   }
   return g;
 }
@@ -119,30 +121,43 @@ graphType* initializeGraph() {
 // 그래프에 정점 v를 삽입하는 함수
 void insertVertex(graphType* g, int v) {
   g->n = v;  // 정점 개수 설정
-  for (int i = 0; i < v; i++) { 
-    g->adjList_H[i] = NULL; // 인접 리스트를 빈 상태로 초기화
+  for (int i = 0; i < v; i++) {
+    g->adjList_H[i] = NULL;  // 인접 리스트를 빈 상태로 초기화
   }
   printf("Insert %d vertices.\n", v);
 }
 
-// 그래프에 간선(u, v)을 삽입하는 함수
 void insertEdge(graphType* g, int u, int v) {
   graphNode* node;  // 새로운 노드를 동적할당할 포인터
+  graphNode* curr; // 현재 노드를 가리킬 포인터
+  graphNode* prev = NULL;   // 이전 노드를 가리킬 포인터
 
-  // 간선 (u, v)를 삽입 전 현재 그래프에 존재하는 지
+  // 간선 (u, v)를 삽입 전 현재 그래프에 존재하는지 확인
   if (u >= g->n || v >= g->n) {
     printf("This N isn't on graph.\n");
     return;
   }
 
-  node = (graphNode*)malloc(sizeof(graphNode));  // 새로운 노드 동적할당
-  node->vertex = v;              // 새로운 노드의 vertex에 v를 넣음
-  node->next = g->adjList_H[u];  // 새로운 노드의 link에 u의 인접 리스트 헤드
-                                 // 포인터를 넣음
-  g->adjList_H[u] = node;  // u의 인접 리스트 헤드 포인터에 새로운 노드를 넣음
+  node = (graphNode*)malloc(sizeof(graphNode)); // 새로운 노드 동적할당
+  node->vertex = v; // 노드에 정점 번호 저장
+  node->next = NULL;    // 노드의 다음 노드를 NULL로 초기화
+
+  // 인접 리스트에 정점 번호 순으로 삽입
+  curr = g->adjList_H[u];
+  while (curr != NULL && curr->vertex < v) {    // 정점 번호 순으로 삽입
+    prev = curr;
+    curr = curr->next;
+  }
+  if (prev == NULL) {   // 첫 번째 노드로 삽입
+    node->next = g->adjList_H[u];
+    g->adjList_H[u] = node;
+  } else {
+    node->next = prev->next;
+    prev->next = node;
+  }
 }
 
-void printList(graphType* g) {
+void printList(graphType* g) {  // 인접 리스트 출력
   int i;
   graphNode* p;
   for (i = 0; i < g->n; i++) {
@@ -158,25 +173,25 @@ void printList(graphType* g) {
 
 // 깊이 우선 탐색
 void DFS_adjList(graphType* g, int v) {
-  graphNode* w; // 인접 리스트 노드를 가리킬 포인터
+  graphNode* w;  // 인접 리스트 노드를 가리킬 포인터
   top = NULL;
   push(v);
   g->visited[v] = 1;
   printf("정점 %c -> ", v + 65);  // 정점을 알파벳으로 출력
 
-// 스택이 비어있지 않은 동안 반복
+  // 스택이 비어있지 않은 동안 반복
   while (!isEmpty()) {
-    v = pop(); // 스택에서 정점을 꺼내 v에 저장
-    w = g->adjList_H[v]; // v의 인접 리스트 헤드 포인터를 w에 저장
+    v = pop();            // 스택에서 정점을 꺼내 v에 저장
+    w = g->adjList_H[v];  // v의 인접 리스트 헤드 포인터를 w에 저장
     while (w) {
       if (!g->visited[w->vertex]) {
         if (isEmpty()) push(v);
         push(w->vertex);
         g->visited[w->vertex] = 1;  // true
         printf("%c -> ", w->vertex + 65);
-        v = w->vertex;  // v를 w로 변경
-        w = g->adjList_H[v]; // w를 v의 인접 리스트 헤드 포인터로 변경
-      } else {  // 이미 방문한 정점인 경우
+        v = w->vertex;        // v를 w로 변경
+        w = g->adjList_H[v];  // w를 v의 인접 리스트 헤드 포인터로 변경
+      } else {                // 이미 방문한 정점인 경우
         w = w->next;
       }
     }
@@ -194,13 +209,13 @@ void BFS_adjList(graphType* g, int v) {
   while (!isQueueEmpty()) {
     v = dequeue();
     w = g->adjList_H[v];
-    while (w) {
-      if (!g->visited[w->vertex]) {
-        enqueue(w->vertex);
+    while (w) { // 인접 리스트를 탐색
+      if (!g->visited[w->vertex]) { // 방문하지 않은 정점인 경우
+        enqueue(w->vertex); // 큐에 삽입
         g->visited[w->vertex] = 1;
         printf("%c -> ", w->vertex + 65);
       }
-      w = w->next;
+      w = w->next;  // 다음 인접 정점으로 이동
     }
   }
   printf("\n");
