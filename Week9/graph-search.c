@@ -27,14 +27,14 @@ void BFS_adjList(graphType* g, int v);
 
 // 스택 구현 (DFS에서 사용)
 
-typedef int element;
+typedef int element; // 정수형 데이터 타입 정의
 
 typedef struct stackNode {
   element data;
   struct stackNode* link;
 } stackNode;
 
-stackNode* top = NULL;
+stackNode* top = NULL; 
 
 int isEmpty() {
   if (top == NULL)
@@ -43,7 +43,7 @@ int isEmpty() {
     return 0;
 }
 
-void push(element item) {
+void push(element item) {  
   stackNode* tmp = (stackNode*)malloc(sizeof(stackNode));
   tmp->data = item;
   tmp->link = top;
@@ -53,7 +53,6 @@ void push(element item) {
 int pop() {
   int item;
   stackNode* tmp = top;
-
   if (isEmpty()) {
     printf("Stack is Empty\n");
     return 0;
@@ -108,11 +107,11 @@ element dequeue() {
 
 // 그래프를 초기화하는 함수
 graphType* initializeGraph() {
-  graphType* g = (graphType*)malloc(sizeof(graphType));
+  graphType* g = (graphType*)malloc(sizeof(graphType)); // 그래프 헤더 노드 동적할당
   g->n = 0;
-  for (int i = 0; i < MAX_VERTEX; i++) {
-    g->adjList_H[i] = NULL;
-    g->visited[i] = 0;
+  for (int i = 0; i < MAX_VERTEX; i++) {    // 미리 지정한 그래프의 최대 정점 개수만큼 반복
+    g->adjList_H[i] = NULL; // 인접 리스트 헤드 포인터를 NULL로 초기화
+    g->visited[i] = 0; // 방문 여부를 나타내는 배열을 0으로 초기화
   }
   return g;
 }
@@ -120,10 +119,10 @@ graphType* initializeGraph() {
 // 그래프에 정점 v를 삽입하는 함수
 void insertVertex(graphType* g, int v) {
   g->n = v;  // 정점 개수 설정
-  for (int i = 0; i < v; i++) {
+  for (int i = 0; i < v; i++) { 
     g->adjList_H[i] = NULL; // 인접 리스트를 빈 상태로 초기화
   }
-  printf("Graph initialized with %d vertices.\n", v);
+  printf("Insert %d vertices.\n", v);
 }
 
 // 그래프에 간선(u, v)을 삽입하는 함수
@@ -150,31 +149,33 @@ void printList(graphType* g) {
     printf("정점 %c의 인접 리스트", i + 65);
     p = g->adjList_H[i];
     while (p) {
-      printf("-> %c", p->vertex + 65);
+      printf("-> %c", p->vertex + 65);  // 정점을 알파벳으로 출력
       p = p->next;
     }
     printf("\n");
   }
 }
 
+// 깊이 우선 탐색
 void DFS_adjList(graphType* g, int v) {
-  graphNode* w;
+  graphNode* w; // 인접 리스트 노드를 가리킬 포인터
   top = NULL;
   push(v);
   g->visited[v] = 1;
   printf("정점 %c -> ", v + 65);  // 정점을 알파벳으로 출력
 
+// 스택이 비어있지 않은 동안 반복
   while (!isEmpty()) {
-    v = pop();
-    w = g->adjList_H[v];
+    v = pop(); // 스택에서 정점을 꺼내 v에 저장
+    w = g->adjList_H[v]; // v의 인접 리스트 헤드 포인터를 w에 저장
     while (w) {
       if (!g->visited[w->vertex]) {
         if (isEmpty()) push(v);
         push(w->vertex);
         g->visited[w->vertex] = 1;  // true
         printf("%c -> ", w->vertex + 65);
-        v = w->vertex;
-        w = g->adjList_H[v];
+        v = w->vertex;  // v를 w로 변경
+        w = g->adjList_H[v]; // w를 v의 인접 리스트 헤드 포인터로 변경
       } else {  // 이미 방문한 정점인 경우
         w = w->next;
       }
