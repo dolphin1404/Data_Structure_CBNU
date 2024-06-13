@@ -157,6 +157,7 @@ void insertEdge(graphType* g, int u, int v) {
   }
 }
 
+// 깃커밋용 주석
 void printList(graphType* g) {  // 인접 리스트 출력
   int i;
   graphNode* p;
